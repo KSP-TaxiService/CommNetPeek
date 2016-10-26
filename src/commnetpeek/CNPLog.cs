@@ -26,7 +26,12 @@ namespace commnetpeek
 
         public static void Debug(string message)
         {
-            UnityEngine.Debug.Log(NAME_LOG_PREFIX + " -> debug: " + message);
+            UnityEngine.Debug.LogWarning(NAME_LOG_PREFIX + " -> debug: " + message);
+        }
+
+        public static void Error(string message)
+        {
+            UnityEngine.Debug.LogError(NAME_LOG_PREFIX + " -> ERROR: " + message);
         }
     }
 }

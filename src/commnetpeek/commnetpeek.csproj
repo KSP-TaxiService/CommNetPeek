@@ -52,9 +52,12 @@
   <ItemGroup>
     <Compile Include="CNPLog.cs" />
     <Compile Include="CommNetPeek.cs" />
-    <Compile Include="CommNetPeekModule.cs" />
-    <Compile Include="DebugWindow.cs" />
+    <Compile Include="UI\AbstractDebugDialog.cs" />
+    <Compile Include="UI\SimpleOutputDialog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="SignalProcessor\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
