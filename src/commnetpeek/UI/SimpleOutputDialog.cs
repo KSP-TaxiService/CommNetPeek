@@ -13,33 +13,36 @@ namespace commnetpeek
         private string briefMessage;
         private Queue<string> messages;
 
+        //Quick string additions
+        public static readonly string stringSeparator = "------------------------";
+        public static readonly string stringNewline = "\n"; //\n? \n\r? LF?
+        public static readonly string stringTab = "\t";
+
         public SimpleOutputDialog(string title, string briefMessage) : base(title, 
-                                                                            (float)(Screen.width * 0.1),  //x
-                                                                            (float)(Screen.height * 0.3), //y
-                                                                            (int)(Screen.width*0.3),      //width
-                                                                            (int)(Screen.height* 0.4))    //height
+                                                                            0.2f,                        //x
+                                                                            0.5f,                        //y
+                                                                            (int)(Screen.width*0.3),     //width
+                                                                            (int)(Screen.height* 0.4))   //height
         {
             this.briefMessage = briefMessage;
             messages = new Queue<string>();
         }
 
-        protected override List<DialogGUIBase> drawGUIComponents()
+        protected override List<DialogGUIBase> drawContentComponents()
         {
             List<DialogGUIBase> listComponments = new List<DialogGUIBase>();
 
             listComponments.Add(new DialogGUIHorizontalLayout(true, false, 0, new RectOffset(), TextAnchor.UpperCenter, new DialogGUIBase[] { new DialogGUILabel(this. briefMessage, false, false) }));
 
             List<DialogGUIHorizontalLayout> scrollContentList = new List<DialogGUIHorizontalLayout>();
-            
-            for (int i = 0; i < messages.Count; i++)
+            while(messages.Count > 0)
             {
-                DialogGUILabel messageLabel = new DialogGUILabel(messages.ElementAt(i), false, false);
+                DialogGUILabel messageLabel = new DialogGUILabel(messages.Dequeue(), false, false);
                 DialogGUIHorizontalLayout lineGroup = new DialogGUIHorizontalLayout(true, false, 4, new RectOffset(), TextAnchor.MiddleCenter, new DialogGUIBase[] { messageLabel });
                 scrollContentList.Add(lineGroup);
             }
 
-            DialogGUIBase[] scrollList = new DialogGUIBase[messages.Count];
-            scrollList[0] = new DialogGUIContentSizer(ContentSizeFitter.FitMode.Unconstrained, ContentSizeFitter.FitMode.PreferredSize, true);
+            DialogGUIBase[] scrollList = new DialogGUIBase[scrollContentList.Count];
             for (int i = 0; i < scrollContentList.Count; i++)
                 scrollList[i] = scrollContentList[i];
 
@@ -48,7 +51,7 @@ namespace commnetpeek
             return listComponments;
         }
 
-        protected override bool runIntenseInfo()
+        protected override bool runIntenseInfo(Vessel thisVessel)
         {
             messages.Enqueue("yay");
             messages.Enqueue("no");

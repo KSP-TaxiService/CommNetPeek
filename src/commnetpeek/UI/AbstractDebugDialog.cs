@@ -20,27 +20,27 @@ namespace commnetpeek.UI
         protected string dialogTitle;
         protected int windowWidth;
         protected int windowHeight;
-        protected float positionX;
-        protected float positionY;
+        protected float normalizedCenterX; //0.0f to 1.0f
+        protected float normalizedCenterY; //0.0f to 1.0f
 
         protected PopupDialog popupDialog;
-        protected Vessel targetVessel;
+        //protected Vessel targetVessel;
 
-        public AbstractDebugDialog(string dialogTitle, float positionX, float positionY, int windowWidth, int windowHeight)
+        public AbstractDebugDialog(string dialogTitle, float normalizedCenterX, float normalizedCenterY, int windowWidth, int windowHeight)
         {
             this.isActive = false;
             this.popupDialog = null;
-            this.targetVessel = null;
+            //this.targetVessel = null;
 
             this.dialogTitle = dialogTitle;
             this.windowWidth = windowWidth;
             this.windowHeight = windowHeight;
-            this.positionX = positionX;
-            this.positionY = positionY;
+            this.normalizedCenterX = normalizedCenterX;
+            this.normalizedCenterY = normalizedCenterY;
         }
 
-        protected abstract bool runIntenseInfo();
-        protected abstract List<DialogGUIBase> drawGUIComponents();
+        protected abstract bool runIntenseInfo(Vessel thisVessel);
+        protected abstract List<DialogGUIBase> drawContentComponents();
 
         public void launch(Vessel thisVessel)
         {
@@ -48,8 +48,7 @@ namespace commnetpeek.UI
                 return;
 
             this.isActive = true;
-            this.targetVessel = thisVessel;
-            if(runIntenseInfo())
+            if(runIntenseInfo(thisVessel))
                 popupDialog = spawnDialog();
         }
 
@@ -64,10 +63,22 @@ namespace commnetpeek.UI
 
         private PopupDialog spawnDialog()
         {
+            /* This dialog looks like below
+             * -----------------------
+             * |        TITLE        |
+             * |----------------------
+             * |                     |
+             * |      CONTENT        |
+             * |                     |
+             * |----------------------
+             * |       CLOSE      XX |
+             * ----------------------- 
+             */
+
             List<DialogGUIBase> entireComponentList = new List<DialogGUIBase>();
 
             //content
-            List<DialogGUIBase> contentComponentList = drawGUIComponents();
+            List<DialogGUIBase> contentComponentList = drawContentComponents();
             for(int i=0;i<contentComponentList.Count;i++)
                 entireComponentList.Add(contentComponentList.ElementAt(i));
 
@@ -87,7 +98,7 @@ namespace commnetpeek.UI
             MultiOptionDialog moDialog = new MultiOptionDialog("",
                                                                dialogTitle,
                                                                HighLogic.UISkin,
-                                                               new Rect(0.5f, 0.5f, windowWidth, windowHeight),
+                                                               new Rect(normalizedCenterX, normalizedCenterY, windowWidth, windowHeight),
                                                                entireComponentList.ToArray());
 
             return PopupDialog.SpawnPopupDialog(new Vector2(0.5f, 0.5f),

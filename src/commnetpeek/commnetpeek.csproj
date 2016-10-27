@@ -64,7 +64,10 @@
     <PostBuildEvent>"D:\KSPTools\pdb2mdb\pdb2mdb.exe" "$(TargetFileName)"
 xcopy /Y "$(TargetPath)" "E:\GitHub\CommNetPeek\GameData\CommNetPeek\Plugins"
 xcopy /Y "$(TargetDir)$(TargetName).pdb" "E:\GitHub\CommNetPeek\GameData\CommNetPeek\Plugins"
-xcopy /Y "$(TargetDir)$(TargetName).dll.mdb" "E:\GitHub\CommNetPeek\GameData\CommNetPeek\Plugins"</PostBuildEvent>
+xcopy /Y "$(TargetDir)$(TargetName).dll.mdb" "E:\GitHub\CommNetPeek\GameData\CommNetPeek\Plugins"
+xcopy /Y "$(TargetPath)" "D:\KSPTools\StockKSP1.2\GameData\CommNetPeek\Plugins"
+xcopy /Y "$(TargetDir)$(TargetName).pdb" "D:\KSPTools\StockKSP1.2\GameData\CommNetPeek\Plugins"
+xcopy /Y "$(TargetDir)$(TargetName).dll.mdb" "D:\KSPTools\StockKSP1.2\GameData\CommNetPeek\Plugins"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
