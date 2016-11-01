@@ -16,7 +16,7 @@ namespace commnetpeek.UI
 {
     public abstract class AbstractDebugDialog
     {
-        protected bool isActive;
+        protected bool isDisplayed;
         protected string dialogTitle;
         protected int windowWidth;
         protected int windowHeight;
@@ -27,7 +27,7 @@ namespace commnetpeek.UI
 
         public AbstractDebugDialog(string dialogTitle, float normalizedCenterX, float normalizedCenterY, int windowWidth, int windowHeight)
         {
-            this.isActive = false;
+            this.isDisplayed = false;
             this.popupDialog = null;
             //this.targetVessel = null;
 
@@ -43,20 +43,20 @@ namespace commnetpeek.UI
 
         public void launch(Vessel thisVessel, Part commandPart)
         {
-            if (this.isActive)
+            if (this.isDisplayed)
                 return;
 
-            this.isActive = true;
+            this.isDisplayed = true;
             if(runIntenseInfo(thisVessel, commandPart))
                 popupDialog = spawnDialog();
         }
 
         public void dismiss()
         {
-            if (this.isActive && popupDialog != null)
+            if (this.isDisplayed && popupDialog != null)
             {
                 popupDialog.Dismiss();
-                this.isActive = false;
+                this.isDisplayed = false;
             }
         }
 

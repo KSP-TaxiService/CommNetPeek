@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CNPLog.cs" />
+    <Compile Include="CNPUtils.cs" />
     <Compile Include="CommNetPeek.cs" />
     <Compile Include="UI\AbstractDebugDialog.cs" />
     <Compile Include="UI\SimpleOutputDialog.cs" />
@@ -67,7 +68,8 @@ xcopy /Y "$(TargetDir)$(TargetName).pdb" "E:\GitHub\CommNetPeek\GameData\CommNet
 xcopy /Y "$(TargetDir)$(TargetName).dll.mdb" "E:\GitHub\CommNetPeek\GameData\CommNetPeek\Plugins"
 xcopy /Y "$(TargetPath)" "D:\KSPTools\StockKSP1.2\GameData\CommNetPeek\Plugins"
 xcopy /Y "$(TargetDir)$(TargetName).pdb" "D:\KSPTools\StockKSP1.2\GameData\CommNetPeek\Plugins"
-xcopy /Y "$(TargetDir)$(TargetName).dll.mdb" "D:\KSPTools\StockKSP1.2\GameData\CommNetPeek\Plugins"</PostBuildEvent>
+xcopy /Y "$(TargetDir)$(TargetName).dll.mdb" "D:\KSPTools\StockKSP1.2\GameData\CommNetPeek\Plugins"
+xcopy /Y "$(TargetPath)" "D:\Stream\steamapps\common\Kerbal Space Program\GameData\CommNetPeek\Plugins"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

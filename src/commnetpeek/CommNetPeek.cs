@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using UnityEngine;
+﻿using UnityEngine;
 
 /* GENERAL NOTES
  * 1) References in use - Assembly-CSharp.dll, Assembly-CSharp-firstpass.dll, UnityEngine.dll and UnityEngine.UI.dll
@@ -34,11 +29,11 @@ namespace commnetpeek
         [KSPEvent(guiActive = true, guiActiveUnfocused = true, guiName = "CommNet Peek", active = true)]
         public void KSPEventPeek()
         {
-            string vesselName = FlightGlobals.ActiveVessel.GetName();
+            string vesselName = part.vessel.GetName(); // don't use FlightGlobals.ActiveVessel. Could open from another nearby vessel or EVA
             string partType = part.partInfo.title;
 
             SimpleOutputDialog debug_window = new SimpleOutputDialog("CommNet Peek", "Simple output from Part '"+partType+"' of Vessel '"+vesselName+"'.");
-            debug_window.launch(FlightGlobals.ActiveVessel, part);
+            debug_window.launch(part.vessel, part);
         }
     }
 
