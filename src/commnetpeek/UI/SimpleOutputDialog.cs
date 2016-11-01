@@ -14,8 +14,8 @@ namespace commnetpeek
         private Queue<string> messages;
 
         //Quick string additions
-        public static readonly string stringSeparator = "------------------------";
-        public static readonly string stringNewline = "\n"; //\n? \n\r? LF?
+        public static readonly string stringSeparator = new String('-', 30);
+        public static readonly string stringNewline = "\n";
         public static readonly string stringTab = "\t";
 
         public SimpleOutputDialog(string title, string briefMessage) : base(title, 
@@ -32,8 +32,10 @@ namespace commnetpeek
         {
             List<DialogGUIBase> listComponments = new List<DialogGUIBase>();
 
+            //Label
             listComponments.Add(new DialogGUIHorizontalLayout(true, false, 0, new RectOffset(), TextAnchor.UpperCenter, new DialogGUIBase[] { new DialogGUILabel(this. briefMessage, false, false) }));
 
+            //Message labels
             List<DialogGUIHorizontalLayout> scrollContentList = new List<DialogGUIHorizontalLayout>();
             while(messages.Count > 0)
             {
@@ -42,6 +44,7 @@ namespace commnetpeek
                 scrollContentList.Add(lineGroup);
             }
 
+            //Scroll box for message labels
             DialogGUIBase[] scrollList = new DialogGUIBase[scrollContentList.Count];
             for (int i = 0; i < scrollContentList.Count; i++)
                 scrollList[i] = scrollContentList[i];
@@ -51,123 +54,39 @@ namespace commnetpeek
             return listComponments;
         }
 
-        protected override bool runIntenseInfo(Vessel thisVessel)
+        protected override bool runIntenseInfo(Vessel thisVessel, Part commandPart)
         {
-            messages.Enqueue("yay");
-            messages.Enqueue("no");
-            messages.Enqueue("The quick brown fox jumps over the lazy brown dog. The quick brown fox jumps over the lazy brown dog.");
-            messages.Enqueue("NYAN\n\tNYAN\nNYAN");
+            //Connection info
+            CommNet.CommNetVessel commVesselInfo = thisVessel.connection;
+            messages.Enqueue(stringTitle("Connection"));
+            messages.Enqueue(string.Format("Control status: {0} (signal %{1})", commVesselInfo.ControlState, Math.Ceiling(commVesselInfo.SignalStrength*100)));
+            messages.Enqueue(string.Format("Vessel status: {0}", thisVessel.situation));
+            messages.Enqueue(string.Format("Signal delay (s): {0}", commVesselInfo.SignalDelay));
+
+            CommNet.CommPath path = commVesselInfo.ControlPath;
+            string[] nodes = path.ToString().Split(';');
+
+            messages.Enqueue(string.Format("{0}Signal path: {1} {2}", 12345787, stringNewline, path.ToString()));
+            messages.Enqueue(stringTab + "1) YOU @ Kerbin");
+            messages.Enqueue(stringTab + "2) RELAY - VESSEL8 @ Kerbin (signal %100)");
+            messages.Enqueue(stringTab + "3) PILOT - VESSEL9 @ Mun (signal %100)");
+
+            messages.Enqueue(string.Format("{0}Nearest neighbours (excluded the one in the signal path): {1} node(s)", stringNewline, 3));
+            messages.Enqueue(stringTab + "1) 13k to VESSEL1 @ Kerbin (signal %2)");
+            messages.Enqueue(stringTab + "2) 2Mm to VESSEL2 @ Mun (signal %100)");
+            messages.Enqueue(stringTab + "3) 13Mm to VESSEL3 @ Minus (signal %100)");
+
+            messages.Enqueue(stringTitle("RemoteTech"));
+            messages.Enqueue("WIP");
 
             return true;
         }
 
-        /*
-        private PopupDialog nocall()
+        private string stringTitle(string title)
         {
-            List<DialogGUIBase> dialog = new List<DialogGUIBase>();
-            dialog.Add(new DialogGUIHorizontalLayout(true, false, 0, new RectOffset(), TextAnchor.UpperCenter, new DialogGUIBase[]
-                {
-                    new DialogGUILabel(string.Format("Transmit data to the selected vessel:\n{0}", "Text One"), false, false)
-                }));
-
-            dialog.Add(new DialogGUIHorizontalLayout(true, false, 0, new RectOffset(), TextAnchor.UpperCenter, new DialogGUIBase[]
-            {
-            new DialogGUIToggle(false, "Transfer All Open Data",
-                delegate(bool b)
-                {
-                    CNPLog.Debug("radio button pressed");
-                }, 200, 20)
-            }));
-            
-
-            List<DialogGUIHorizontalLayout> vessels = new List<DialogGUIHorizontalLayout>();
-
-            for (int i = 1; i >= 0; i--)
-            {
-                DialogGUILabel label = null;
-
-                if (true)
-                {
-                    string transmit = string.Format("Xmit: {0:P0}", 66.99);
-
-                    if (true)
-                        transmit += string.Format("(+{0:P0})", 1337);
-
-                    label = new DialogGUILabel(transmit, 130, 25);
-                }
-
-                DialogGUIBase button = null;
-
-                if (true)
-                {
-                    button = new DialogGUIButton(
-                                            "some vessel name",
-                                            delegate
-                                            {
-                                                CNPLog.Debug("Button pressed");
-                                            },
-                                            160,
-                                            30,
-                                            true,
-                                            null);
-
-                    button.size = new Vector2(160, 30);
-                }
-
-                DialogGUIHorizontalLayout h = new DialogGUIHorizontalLayout(true, false, 4, new RectOffset(), TextAnchor.MiddleCenter, new DialogGUIBase[] { button });
-
-                if (label != null)
-                    h.AddChild(label);
-
-                vessels.Add(h);
-            }
-
-            DialogGUIBase[] scrollList = new DialogGUIBase[vessels.Count + 1];
-
-            scrollList[0] = new DialogGUIContentSizer(ContentSizeFitter.FitMode.Unconstrained, ContentSizeFitter.FitMode.PreferredSize, true);
-
-            for (int i = 0; i < vessels.Count; i++)
-                scrollList[i + 1] = vessels[i];
-
-            dialog.Add(new DialogGUIScrollList(Vector2.one, false, true,
-                new DialogGUIVerticalLayout(10, 100, 4, new RectOffset(6, 24, 10, 10), TextAnchor.MiddleLeft, scrollList)
-                ));
-
-            dialog.Add(new DialogGUISpace(4));
-
-            dialog.Add(new DialogGUIHorizontalLayout(new DialogGUIBase[]
-            {
-                new DialogGUIFlexibleSpace(),
-                new DialogGUIButton("Cancel Transfer", dismiss),
-                new DialogGUIFlexibleSpace(),
-                new DialogGUILabel("6.9", false, false)
-            }));
-
-            RectTransform resultRect = null; // resultsDialog.GetComponent<RectTransform>();
-
-            Rect pos = new Rect(0.5f, 0.5f, 300, 300);
-
-            if (resultRect != null)
-            {
-                Vector2 resultPos = resultRect.position;
-
-                float scale = GameSettings.UI_SCALE;
-
-                int width = Screen.width;
-                int height = Screen.height;
-
-                float xpos = (resultPos.x / scale) + width / 2;
-                float ypos = (resultPos.y / scale) + height / 2;
-
-                float yNorm = ypos / height;
-
-                pos.y = yNorm;
-
-                pos.x = xpos > (width - (550 * scale)) ? (xpos - 360) / width : (xpos + 360) / width;
-            }
-
-            return PopupDialog.SpawnPopupDialog(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new MultiOptionDialog("", "Science Relay", UISkinManager.defaultSkin, pos, dialog.ToArray()), false, UISkinManager.defaultSkin);
+            return stringSeparator + stringNewline +
+                   "- " + title + stringNewline + 
+                   stringSeparator;
         }
-        */
     }
 }

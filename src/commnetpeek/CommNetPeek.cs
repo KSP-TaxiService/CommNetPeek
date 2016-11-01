@@ -11,10 +11,8 @@ using UnityEngine;
  */
 
 /* TO-DO list
- * 1) Find out about PopupDialog's blocking mechanism on right-click context menu
  * 2) Disable the above mechanism when dialog is active
  * 3) Signal delay
- * 4) Issue with positioning the dialog
  */ 
 
 namespace commnetpeek
@@ -39,8 +37,8 @@ namespace commnetpeek
             string vesselName = FlightGlobals.ActiveVessel.GetName();
             string partType = part.partInfo.title;
 
-            SimpleOutputDialog debug_window = new SimpleOutputDialog("CommNet Peek","Simple output from Part '"+partType+"' of Vessel '"+vesselName+"'.");
-            debug_window.launch(FlightGlobals.ActiveVessel);
+            SimpleOutputDialog debug_window = new SimpleOutputDialog("CommNet Peek", "Simple output from Part '"+partType+"' of Vessel '"+vesselName+"'.");
+            debug_window.launch(FlightGlobals.ActiveVessel, part);
         }
     }
 

@@ -24,7 +24,6 @@ namespace commnetpeek.UI
         protected float normalizedCenterY; //0.0f to 1.0f
 
         protected PopupDialog popupDialog;
-        //protected Vessel targetVessel;
 
         public AbstractDebugDialog(string dialogTitle, float normalizedCenterX, float normalizedCenterY, int windowWidth, int windowHeight)
         {
@@ -39,16 +38,16 @@ namespace commnetpeek.UI
             this.normalizedCenterY = normalizedCenterY;
         }
 
-        protected abstract bool runIntenseInfo(Vessel thisVessel);
+        protected abstract bool runIntenseInfo(Vessel thisVessel, Part commandPart);
         protected abstract List<DialogGUIBase> drawContentComponents();
 
-        public void launch(Vessel thisVessel)
+        public void launch(Vessel thisVessel, Part commandPart)
         {
             if (this.isActive)
                 return;
 
             this.isActive = true;
-            if(runIntenseInfo(thisVessel))
+            if(runIntenseInfo(thisVessel, commandPart))
                 popupDialog = spawnDialog();
         }
 
@@ -104,7 +103,7 @@ namespace commnetpeek.UI
             return PopupDialog.SpawnPopupDialog(new Vector2(0.5f, 0.5f),
                                                 new Vector2(0.5f, 0.5f),
                                                 moDialog,
-                                                false,
+                                                true,
                                                 HighLogic.UISkin);
         }
     }
