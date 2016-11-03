@@ -2,13 +2,11 @@
 
 /* GENERAL NOTES
  * 1) References in use - Assembly-CSharp.dll, Assembly-CSharp-firstpass.dll, UnityEngine.dll and UnityEngine.UI.dll
- * 2) GPL 2.0 so go nuts with this project!
+ * 2) Compiled against Net 3.5
+ * 3) GPL 2.0 so go nuts with this project!
  */
 
-/* TO-DO list
- * 2) Disable the above mechanism when dialog is active
- * 3) Signal delay
- */ 
+//TODO: Signal delay
 
 namespace commnetpeek
 {

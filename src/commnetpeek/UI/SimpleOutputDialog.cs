@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 namespace commnetpeek
 {
-    public class SimpleOutputDialog : UI.AbstractDebugDialog
+    public class SimpleOutputDialog : UI.AbstractDialog
     {
         private string briefMessage;
         private Queue<string> messages;
@@ -45,9 +45,10 @@ namespace commnetpeek
             }
 
             //Prepare a list container for the message GUILayouts
-            DialogGUIBase[] messageLabels = new DialogGUIBase[eachMessageGroupList.Count];
+            DialogGUIBase[] messageLabels = new DialogGUIBase[eachMessageGroupList.Count + 1];
+            messageLabels[0] = new DialogGUIContentSizer(ContentSizeFitter.FitMode.Unconstrained, ContentSizeFitter.FitMode.PreferredSize, true);
             for (int i = 0; i < eachMessageGroupList.Count; i++)
-                messageLabels[i] = eachMessageGroupList[i];
+                messageLabels[i+1] = eachMessageGroupList[i];
 
             listComponments.Add(new DialogGUIScrollList(Vector2.one, false, true, new DialogGUIVerticalLayout(10, 100, 4, new RectOffset(5, 15, 0, 0), TextAnchor.UpperLeft, messageLabels)));
             
@@ -67,63 +68,17 @@ namespace commnetpeek
             messages.Enqueue(string.Format("Vessel status: {0}", thisVessel.situation));
             messages.Enqueue(string.Format("Signal delay (s): {0}", commVesselInfo.SignalDelay));
 
-            //signal path
-            CommPath graphPath = commVesselInfo.ControlPath;
-            double totalDistanceCost = 0;
-            messages.Enqueue(string.Format("{0}Signal path:", stringNewline));
+            processSignalPath(thisVessel, commandPart);
 
-            bool firstNodeProcessed = false;
-            List<CommLink> edges = graphPath.ToList();
-            for (int i=0; i<edges.Count(); i++)
-            {
-                CommLink thisEdge = edges.ElementAt(i);
-                totalDistanceCost += thisEdge.cost;
-
-                if(!firstNodeProcessed)
-                {
-                    messages.Enqueue(string.Format("{0}1) YOU @ {1}", stringTab, commVesselInfo.Vessel.lastBody.bodyName));
-                    firstNodeProcessed = true;
-                }
-
-                CommNode destNode = thisEdge.b;
-                Vessel destVessel = CNPUtils.findCorrespondingVessel(destNode);
-
-                string commType;
-                string location;
-                string nodeName = destNode.name;
-                double signalStrength = thisEdge.signalStrength;
-
-                if (destVessel == null) //could be a celestial body 
-                    location = FlightGlobals.GetHomeBodyName();
-                else
-                    location = destVessel.mainBody.bodyName;
-
-                if (destNode.isControlSourceMultiHop)
-                    commType = "KCS";
-                else
-                    commType = "RELAY"; // what about pilot?
-
-                messages.Enqueue(string.Format("{0}{1}) {2} - {3} @ {4} (signal {5}%)", stringTab, i+2, commType, CNPUtils.neatVesselName(nodeName), location, CNPUtils.neatSignalStrength(signalStrength)));
-            }
-            messages.Enqueue(string.Format("{0}Distance: {1} (+{2:0.##}s)", stringTab, CNPUtils.neatDistance(totalDistanceCost), totalDistanceCost/3E+08));
-
-            //nearest neighbour nodes
-            messages.Enqueue(string.Format("{0}Nearest neighbours (excluded the one in the signal path): {1} node(s)", stringNewline, 3));
-            messages.Enqueue(stringTab + "1) 13k to VESSEL1 @ Kerbin (signal %2)");
-            messages.Enqueue(stringTab + "2) 2Mm to VESSEL2 @ Mun (signal %100)");
-            messages.Enqueue(stringTab + "3) 13Mm to VESSEL3 @ Minus (signal %100)");
+            processNeighbourNodes(thisVessel, commandPart, netInstance);
 
             //RemoteTech info
             messages.Enqueue(stringNewline + stringTitle("RemoteTech"));
-            messages.Enqueue("Not implemented");
+            messages.Enqueue("Not implemented yet");
 
             //Stock CommNet's debug
-            /*
-            messages.Enqueue(stringTitle("CommNetwork.CreateDebug()"));
-            string[] lines = netInstance.CreateDebug().Split('\n');
-            for (int i = 0; i < lines.Length; i++)
-                messages.Enqueue(lines[i]);
-            */
+            messages.Enqueue(stringNewline + stringTitle("CommNetwork.CreateDebug()"));
+            messages.Enqueue(netInstance.CreateDebug());
 
             return true;
         }
@@ -133,6 +88,64 @@ namespace commnetpeek
             return stringSeparator + stringNewline +
                    "- " + title + stringNewline + 
                    stringSeparator;
+        }
+
+        private void processSignalPath(Vessel thisVessel, Part commandPart)
+        {
+            CommNetVessel commVesselInfo = thisVessel.connection;
+            CommPath graphPath = commVesselInfo.ControlPath;
+            List<CommLink> edges = graphPath.ToList();
+            messages.Enqueue(string.Format("{0}Signal path: {1}", stringNewline, edges.Count() == 0 ? "Non-existent" : ""));
+
+            double totalDistanceCost = 0;
+            bool firstNodeProcessed = false;
+            for (int i = 0; i < edges.Count(); i++)
+            {
+                CommLink thisEdge = edges.ElementAt(i);
+                totalDistanceCost += thisEdge.cost;
+
+                if (!firstNodeProcessed)
+                {
+                    messages.Enqueue(string.Format("{0}1) PART - {1} @ {2}", stringTab, commandPart.partInfo.title, commVesselInfo.Vessel.mainBody.bodyName));
+                    firstNodeProcessed = true;
+                }
+
+                CommNode destNode = thisEdge.b;
+                Vessel destVessel = CNPUtils.findCorrespondingVessel(destNode);
+
+                string nodeType;
+                string nodeLocation;
+                string nodeName = destNode.name;
+                double signalStrength = thisEdge.signalStrength;
+
+                if (destVessel == null) //could be a celestial body 
+                    nodeLocation = FlightGlobals.GetHomeBodyName();
+                else
+                    nodeLocation = destVessel.mainBody.bodyName;
+
+                if (thisEdge.hopType == HopType.ControlPoint)
+                    nodeType = "REMOTE PILOT";
+                else if (thisEdge.hopType == HopType.Home)
+                    nodeType = "MISSION CONTROL";
+                else
+                    nodeType = "RELAY";
+
+                messages.Enqueue(string.Format("{0}{1}) {2} - {3} @ {4} (signal {5}%)", stringTab, i + 2, nodeType, CNPUtils.neatVesselName(nodeName), nodeLocation, CNPUtils.neatSignalStrength(signalStrength)));
+            }
+            messages.Enqueue(string.Format("{0}Distance: {1} (+{2:0.##}s)", stringTab, CNPUtils.neatDistance(totalDistanceCost), totalDistanceCost / 3E+08));
+        }
+
+        private void processNeighbourNodes(Vessel thisVessel, Part commandPart, CommNetwork netInstance)
+        {
+            CommNetVessel commVesselInfo = thisVessel.connection;
+
+            //return net.FindPath(vessel1.Connection.Comm, tempPath, vessel2.Connection.Comm) || net.FindPath(vessel2.Connection.Comm, tempPath, vessel1.Connection.Comm);
+
+            //public override CommNode FindClosestWhere(CommNode start, CommPath path, Func<CommNode, CommNode, bool> where);
+        
+
+            messages.Enqueue(string.Format("{0}Neighbour nodes: {1} node(s)", stringNewline, 3));
+            //messages.Enqueue(stringTab + "3) 13Mm to VESSEL3 @ Minus (signal %100)");
         }
     }
 }

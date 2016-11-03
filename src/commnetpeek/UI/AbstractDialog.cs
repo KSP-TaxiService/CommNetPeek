@@ -8,13 +8,15 @@ using UnityEngine.UI;
 
 /* References
  * http://forum.kerbalspaceprogram.com/index.php?/topic/149324-popupdialog-and-the-dialoggui-classes/
- * 
- * 
+ * http://forum.kerbalspaceprogram.com/index.php?/topic/151354-unity-ui-creation-tutorial/
+ * http://forum.kerbalspaceprogram.com/index.php?/topic/151270-gui-scrolling-problem/
  */
+
+//TODO: Disable the above mechanism when dialog is active
 
 namespace commnetpeek.UI
 {
-    public abstract class AbstractDebugDialog
+    public abstract class AbstractDialog
     {
         protected bool isDisplayed;
         protected string dialogTitle;
@@ -25,7 +27,7 @@ namespace commnetpeek.UI
 
         protected PopupDialog popupDialog;
 
-        public AbstractDebugDialog(string dialogTitle, float normalizedCenterX, float normalizedCenterY, int windowWidth, int windowHeight)
+        public AbstractDialog(string dialogTitle, float normalizedCenterX, float normalizedCenterY, int windowWidth, int windowHeight)
         {
             this.isDisplayed = false;
             this.popupDialog = null;

@@ -4,6 +4,9 @@ using System.Linq;
 
 using CommNet;
 
+//TODO: Cache map of vessel - non-null commNode at startup
+//TODO: A method for finding neighbour nodes
+
 namespace commnetpeek
 {
     public class CNPUtils
@@ -27,9 +30,9 @@ namespace commnetpeek
 
         public static string neatVesselName(string name)
         {
-            if (name.LastIndexOf(':') >= 0)
-                return name.Split(':')[1];
-            else
+            if (name.LastIndexOf(':') >= 0) // eg KCS:MonkeyIsland
+                return name.Substring(name.LastIndexOf(':')+1);
+            else // eg VesselName (unloaded)
                 return name.Substring(0, name.LastIndexOf('('));
         }
 
@@ -37,7 +40,7 @@ namespace commnetpeek
         {
             List<Vessel> allVessels = FlightGlobals.Vessels;
 
-            //brute-force search temporarily until I find better API with < O(n) time
+            //brute-force search temporarily until I find a \omega(n) method
             for(int i=0; i< allVessels.Count(); i++)
             {
                 Vessel thisVessel = allVessels.ElementAt(i);

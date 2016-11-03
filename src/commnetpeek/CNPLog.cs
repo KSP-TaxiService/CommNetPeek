@@ -14,11 +14,6 @@ namespace commnetpeek
     {
         public static readonly string NAME_LOG_PREFIX = "CommNet Peek";
 
-        static CNPLog()
-        {
-            //Empty
-        }
-
         public static void Verbose(string message)
         {
             UnityEngine.Debug.Log(NAME_LOG_PREFIX + " -> verbose: " + message);
