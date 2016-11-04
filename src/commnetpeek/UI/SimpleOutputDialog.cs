@@ -6,6 +6,9 @@ using CommNet;
 using UnityEngine;
 using UnityEngine.UI;
 
+//TODO: CommLink.signalStrength bug
+//TODO: need better way to find out if node has relay or not
+
 namespace commnetpeek
 {
     public class SimpleOutputDialog : UI.AbstractDialog
@@ -57,9 +60,9 @@ namespace commnetpeek
 
         protected override bool runIntenseInfo(Vessel thisVessel, Part commandPart)
         {
-            CommNetwork netInstance = CommNetNetwork.Instance.CommNet;
             CommNetVessel commVesselInfo = thisVessel.connection;
-            
+            CommNetwork commNet = CommNetNetwork.Instance.CommNet;
+
             //Connection info
             messages.Enqueue(stringTitle("Connection"));
 
@@ -70,7 +73,7 @@ namespace commnetpeek
 
             processSignalPath(thisVessel, commandPart);
 
-            processNeighbourNodes(thisVessel, commandPart, netInstance);
+            processNeighbourNodes(thisVessel, commandPart);
 
             //RemoteTech info
             messages.Enqueue(stringNewline + stringTitle("RemoteTech"));
@@ -78,7 +81,7 @@ namespace commnetpeek
 
             //Stock CommNet's debug
             messages.Enqueue(stringNewline + stringTitle("CommNetwork.CreateDebug()"));
-            messages.Enqueue(netInstance.CreateDebug());
+            messages.Enqueue(commNet.CreateDebug());
 
             return true;
         }
@@ -113,39 +116,69 @@ namespace commnetpeek
                 CommNode destNode = thisEdge.b;
                 Vessel destVessel = CNPUtils.findCorrespondingVessel(destNode);
 
-                string nodeType;
-                string nodeLocation;
+                string nodeType = neatHopType(thisEdge.hopType);
+                string nodeLocation = (destVessel == null)? FlightGlobals.GetHomeBodyName() : destVessel.mainBody.bodyName;
                 string nodeName = destNode.name;
-                double signalStrength = thisEdge.signalStrength;
+                double signalStrength = thisEdge.signalStrength;                
 
-                if (destVessel == null) //could be a celestial body 
-                    nodeLocation = FlightGlobals.GetHomeBodyName();
-                else
-                    nodeLocation = destVessel.mainBody.bodyName;
-
-                if (thisEdge.hopType == HopType.ControlPoint)
-                    nodeType = "REMOTE PILOT";
-                else if (thisEdge.hopType == HopType.Home)
-                    nodeType = "MISSION CONTROL";
-                else
-                    nodeType = "RELAY";
-
-                messages.Enqueue(string.Format("{0}{1}) {2} - {3} @ {4} (signal {5}%)", stringTab, i + 2, nodeType, CNPUtils.neatVesselName(nodeName), nodeLocation, CNPUtils.neatSignalStrength(signalStrength)));
+                messages.Enqueue(string.Format("{0}{1}) {2} - {3} @ {4} (signal {5}%)", 
+                                                stringTab,
+                                                i + 2,
+                                                nodeType,
+                                                CNPUtils.neatVesselName(nodeName),
+                                                nodeLocation,
+                                                CNPUtils.neatSignalStrength(signalStrength)));
             }
-            messages.Enqueue(string.Format("{0}Distance: {1} (+{2:0.##}s)", stringTab, CNPUtils.neatDistance(totalDistanceCost), totalDistanceCost / 3E+08));
+            messages.Enqueue(string.Format("{0}Distance: {1} (+{2:0.00}s)", stringTab, CNPUtils.neatDistance(totalDistanceCost), totalDistanceCost / 3E+08));
         }
 
-        private void processNeighbourNodes(Vessel thisVessel, Part commandPart, CommNetwork netInstance)
+        private void processNeighbourNodes(Vessel thisVessel, Part commandPart)
         {
-            CommNetVessel commVesselInfo = thisVessel.connection;
+            List<CommLink> neighbourLinks = CNPUtils.findNeighbourLinks(thisVessel);
+            IEqualityComparer<CommNode> comparer = thisVessel.connection.Comm.Comparer;
+            messages.Enqueue(string.Format("{0}Neighbour nodes: {1} node(s)", stringNewline, neighbourLinks.Count()));
 
-            //return net.FindPath(vessel1.Connection.Comm, tempPath, vessel2.Connection.Comm) || net.FindPath(vessel2.Connection.Comm, tempPath, vessel1.Connection.Comm);
+            neighbourLinks = neighbourLinks.OrderBy(x => x.cost).ToList();
 
-            //public override CommNode FindClosestWhere(CommNode start, CommPath path, Func<CommNode, CommNode, bool> where);
-        
+            for(int i=0; i< neighbourLinks.Count(); i++)
+            {
+                CommLink thisEdge = neighbourLinks.ElementAt(i);
+                CommNode neighbourNode = comparer.Equals(thisEdge.a, thisVessel.connection.Comm) ? thisEdge.b : thisEdge.a;
+                Vessel destVessel = CNPUtils.findCorrespondingVessel(neighbourNode);
 
-            messages.Enqueue(string.Format("{0}Neighbour nodes: {1} node(s)", stringNewline, 3));
-            //messages.Enqueue(stringTab + "3) 13Mm to VESSEL3 @ Minus (signal %100)");
+                string neighbourAntType = neatAntennaType(neighbourNode);
+                string neighbourLocation = (destVessel == null) ? FlightGlobals.GetHomeBodyName() : destVessel.mainBody.bodyName;
+                double linkDistance = thisEdge.cost; // possible stock bug: cost is zero sometimes
+                string neighbourName = neighbourNode.name;
+                double signalStrength = thisEdge.signalStrength; // possible stock bug: signalStrength mysteriously gives cost instead of [0,1]
+
+                messages.Enqueue(string.Format("{0}{1}) {2} to {3} ({4}) @ {5} (signal {6}%)",
+                                                stringTab,
+                                                i+1,
+                                                CNPUtils.neatDistance(linkDistance),
+                                                CNPUtils.neatVesselName(neighbourName),
+                                                neighbourAntType,
+                                                neighbourLocation,
+                                                CNPUtils.neatSignalStrength(signalStrength)));
+            }
+        }
+
+        private string neatHopType(HopType hopType)
+        {
+            if (hopType == HopType.ControlPoint)
+                return "PILOT";
+            else if (hopType == HopType.Home)
+                return "GSTATION";
+            else
+                return "RELAY";
+        }
+
+        private string neatAntennaType(CommNode commNodeRef)
+        {
+            if (commNodeRef.antennaTransmit.power == 0.0)
+                return "RELAY";
+            else
+                return "DIRECT";
         }
     }
 }

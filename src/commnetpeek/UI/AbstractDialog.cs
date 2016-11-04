@@ -105,7 +105,7 @@ namespace commnetpeek.UI
             return PopupDialog.SpawnPopupDialog(new Vector2(0.5f, 0.5f),
                                                 new Vector2(0.5f, 0.5f),
                                                 moDialog,
-                                                true,
+                                                false, // true = ?
                                                 HighLogic.UISkin);
         }
     }

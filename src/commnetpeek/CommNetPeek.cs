@@ -10,17 +10,6 @@
 
 namespace commnetpeek
 {
-    //load from setting file
-    public static class CommNetPeekSettings
-    {
-        private static bool isLoaded = false;
-        public static void loadFromFile()
-        {
-            string filename = "commnetpeek_settings.cfg";
-            isLoaded = true;
-        }
-    }
-
     //This class is coupled with the commnetpeek_module.cfg
     public class CommNetPeekModule : PartModule
     {
@@ -58,11 +47,6 @@ namespace commnetpeek
         public void Update()
         {
             //CNPLog.Verbose("Flight script updates");
-        }
-
-        public void OnGUI()
-        {
-            //CNPLog.Verbose("Flight script does GUI stuff");
         }
     }
 }

@@ -53,6 +53,7 @@
     <Compile Include="CNPLog.cs" />
     <Compile Include="CNPUtils.cs" />
     <Compile Include="CommNetPeek.cs" />
+    <Compile Include="CommNetPeekSettings.cs" />
     <Compile Include="UI\AbstractDialog.cs" />
     <Compile Include="UI\SimpleOutputDialog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
