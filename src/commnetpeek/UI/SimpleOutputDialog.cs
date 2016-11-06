@@ -28,7 +28,8 @@ namespace commnetpeek
                                                                             (int)(Screen.height* 0.4))   //height
         {
             this.briefMessage = briefMessage;
-            messages = new Queue<string>();
+            this.messages = new Queue<string>();
+            this.CNPSettings = CommNetPeekSettings.Instance;
         }
 
         protected override List<DialogGUIBase> drawContentComponents()
@@ -129,7 +130,7 @@ namespace commnetpeek
                                                 nodeLocation,
                                                 CNPUtils.neatSignalStrength(signalStrength)));
             }
-            messages.Enqueue(string.Format("{0}Distance: {1} (+{2:0.00}s)", stringTab, CNPUtils.neatDistance(totalDistanceCost), totalDistanceCost / 3E+08));
+            messages.Enqueue(string.Format("{0}Distance: {1} (+{2:0.00}s)", stringTab, CNPUtils.neatDistance(totalDistanceCost), totalDistanceCost / CNPSettings.SpeedOfLight));
         }
 
         private void processNeighbourNodes(Vessel thisVessel, Part commandPart)
@@ -146,11 +147,11 @@ namespace commnetpeek
                 CommNode neighbourNode = comparer.Equals(thisEdge.a, thisVessel.connection.Comm) ? thisEdge.b : thisEdge.a;
                 Vessel destVessel = CNPUtils.findCorrespondingVessel(neighbourNode);
 
-                string neighbourAntType = neatAntennaType(neighbourNode);
+                string neighbourAntType = neatAntennaType(neighbourNode); // stock bug
                 string neighbourLocation = (destVessel == null) ? FlightGlobals.GetHomeBodyName() : destVessel.mainBody.bodyName;
-                double linkDistance = thisEdge.cost; // possible stock bug: cost is zero sometimes
+                double linkDistance = thisEdge.cost;
                 string neighbourName = neighbourNode.name;
-                double signalStrength = thisEdge.signalStrength; // possible stock bug: signalStrength mysteriously gives cost instead of [0,1]
+                double signalStrength = thisEdge.GetSignalStrength(neighbourNode); // stock bug: signalStrength mysteriously gives cost instead of [0,1]
 
                 messages.Enqueue(string.Format("{0}{1}) {2} to {3} ({4}) @ {5} (signal {6}%)",
                                                 stringTab,
@@ -175,10 +176,15 @@ namespace commnetpeek
 
         private string neatAntennaType(CommNode commNodeRef)
         {
-            if (commNodeRef.antennaTransmit.power == 0.0)
-                return "RELAY";
-            else
+            if (commNodeRef.antennaRelay.power == 0.0)
                 return "DIRECT";
+            else
+                return "RELAY";
+        }
+
+        private double tempFix(CommLink thisLink)
+        {
+            return Math.Max(thisLink.strengthAR, thisLink.strengthBR);
         }
     }
 }

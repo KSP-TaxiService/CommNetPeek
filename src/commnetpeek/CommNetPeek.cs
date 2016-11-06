@@ -31,7 +31,6 @@ namespace commnetpeek
         public void Start()
         {
             CNPLog.Verbose("Flight script starts");
-            CommNetPeekSettings.loadFromFile();
         }
 
         public void OnDestroy()
@@ -41,7 +40,7 @@ namespace commnetpeek
 
         public void Awake()
         {
-            CNPLog.Verbose("Flight script awakes");
+            //CNPLog.Verbose("Flight script awakes");
         }
 
         public void Update()

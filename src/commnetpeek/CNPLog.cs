@@ -14,19 +14,19 @@ namespace commnetpeek
     {
         public static readonly string NAME_LOG_PREFIX = "CommNet Peek";
 
-        public static void Verbose(string message)
+        public static void Verbose(string message, params object[] param)
         {
-            UnityEngine.Debug.Log(NAME_LOG_PREFIX + " -> verbose: " + message);
+            UnityEngine.Debug.Log(string.Format("{0} -> verbose: {1}", NAME_LOG_PREFIX, string.Format(message, param)));
         }
 
-        public static void Debug(string message)
+        public static void Debug(string message, params object[] param)
         {
-            UnityEngine.Debug.LogWarning(NAME_LOG_PREFIX + " -> debug: " + message);
+            UnityEngine.Debug.LogWarning(string.Format("{0} -> debug: {1}", NAME_LOG_PREFIX, string.Format(message, param)));
         }
 
-        public static void Error(string message)
+        public static void Error(string message, params object[] param)
         {
-            UnityEngine.Debug.LogError(NAME_LOG_PREFIX + " -> ERROR: " + message);
+            UnityEngine.Debug.LogError(string.Format("{0} -> ERROR: {1}", NAME_LOG_PREFIX, string.Format(message, param)));
         }
     }
 }

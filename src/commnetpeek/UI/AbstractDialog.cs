@@ -25,19 +25,22 @@ namespace commnetpeek.UI
         protected float normalizedCenterX; //0.0f to 1.0f
         protected float normalizedCenterY; //0.0f to 1.0f
 
+        protected Settings CNPSettings;
+
         protected PopupDialog popupDialog;
 
         public AbstractDialog(string dialogTitle, float normalizedCenterX, float normalizedCenterY, int windowWidth, int windowHeight)
         {
             this.isDisplayed = false;
             this.popupDialog = null;
-            //this.targetVessel = null;
 
             this.dialogTitle = dialogTitle;
             this.windowWidth = windowWidth;
             this.windowHeight = windowHeight;
             this.normalizedCenterX = normalizedCenterX;
             this.normalizedCenterY = normalizedCenterY;
+
+            this.CNPSettings = CommNetPeekSettings.Instance;
         }
 
         protected abstract bool runIntenseInfo(Vessel thisVessel, Part commandPart);
@@ -91,7 +94,7 @@ namespace commnetpeek.UI
                                             new DialogGUIFlexibleSpace(),
                                             new DialogGUIButton("Close", dismiss),
                                             new DialogGUIFlexibleSpace(),
-                                            new DialogGUILabel("vX.X", false, false)
+                                            new DialogGUILabel(string.Format("v{0}.{1}", CNPSettings.MajorVersion, CNPSettings.MinorVersion), false, false)
                                         }
                                     ));
 
