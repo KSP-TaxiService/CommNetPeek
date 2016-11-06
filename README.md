@@ -2,9 +2,9 @@
 
 ##Introduction
 
-CommNet Peek is a debugging plugin for Kerbal Space Program that adds a button to every probe and command module. This little button launchs a dialog and displays some underlying information about the CommNet network. A player can read this CommNet data whenever s/he feels like during a play session.
+CommNet Peek is a debugging plugin for Kerbal Space Program that adds a button to every probe and command module. This little button launches a dialog and displays some underlying information about the CommNet network. A player can read this CommNet data whenever s/he feels like during a play session.
 
-(**Work in progress**) Additionally, the plugin also implements the concept of a signal radio that obeys the phsyical rule of the light speed. Any command issued to an active vessel will be delayed before it can be in effect.
+(**Work in progress**) Additionally, the plugin also implements the concept of a signal radio that obeys the physical rule of the light speed. Any command issued to an active vessel will be delayed before it can be in effect.
 
 ##Features
 
@@ -47,4 +47,5 @@ I would like to thank the contributors behind the RemoteTech mod for the codes a
 ##License
 
 GNU GENERAL PUBLIC LICENSE Version 2
+
 TLDR: http://tldrlegal.com/license/gnu-general-public-license-v2
