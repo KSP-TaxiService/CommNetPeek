@@ -54,13 +54,14 @@
     <Compile Include="CNPUtils.cs" />
     <Compile Include="CommNetPeek.cs" />
     <Compile Include="CommNetPeekSettings.cs" />
+    <Compile Include="SignalDelay\AbstractCommand.cs" />
+    <Compile Include="SignalDelay\RTCommNetVessel.cs" />
+    <Compile Include="SignalDelay\SignalDelayCore.cs" />
     <Compile Include="UI\AbstractDialog.cs" />
     <Compile Include="UI\SimpleOutputDialog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="SignalProcessor\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>"D:\KSPTools\pdb2mdb\pdb2mdb.exe" "$(TargetFileName)"

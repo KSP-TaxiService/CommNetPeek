@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using CommNet;
 
 /* GENERAL NOTES
  * 1) References in use - Assembly-CSharp.dll, Assembly-CSharp-firstpass.dll, UnityEngine.dll and UnityEngine.UI.dll
@@ -40,7 +41,7 @@ namespace commnetpeek
 
         public void Awake()
         {
-            //CNPLog.Verbose("Flight script awakes");
+            CNPLog.Verbose("Flight script awakes");
         }
 
         public void Update()
