@@ -70,7 +70,7 @@ namespace commnetpeek
             //quick glance
             messages.Enqueue(string.Format("Control status: {0} (signal {1}%)", commVesselInfo.ControlState, CNPUtils.neatSignalStrength(commVesselInfo.SignalStrength)));
             messages.Enqueue(string.Format("Vessel status: {0}", thisVessel.situation));
-            messages.Enqueue(string.Format("Signal delay (s): {0}", commVesselInfo.SignalDelay));
+            messages.Enqueue(string.Format("Signal delay (s): +{0:0.00}", commVesselInfo.SignalDelay));
 
             processSignalPath(thisVessel, commandPart);
 

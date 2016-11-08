@@ -16,6 +16,8 @@ namespace commnetpeek.SignalDelay
         {
             this.CNPSettings = CommNetPeekSettings.Instance;
             this.commandQueue = new Queue<AbstractCommand>();
+
+            CNPLog.Debug("SignalDelayCore constructor");
         }
 
         public bool isEnabled()
