@@ -139,26 +139,27 @@ namespace commnetpeek
             IEqualityComparer<CommNode> comparer = thisVessel.connection.Comm.Comparer;
             messages.Enqueue(string.Format("{0}Neighbour nodes: {1} node(s)", stringNewline, neighbourLinks.Count()));
 
-            neighbourLinks = neighbourLinks.OrderBy(x => x.cost).ToList();
+            //neighbourLinks = neighbourLinks.OrderBy(x => x.cost).ToList();
+            neighbourLinks = neighbourLinks.OrderBy(x => Vector3d.Distance(x.a.precisePosition, x.b.precisePosition)).ToList();
 
-            for(int i=0; i< neighbourLinks.Count(); i++)
+            for (int i=0; i< neighbourLinks.Count(); i++)
             {
                 CommLink thisEdge = neighbourLinks.ElementAt(i);
                 CommNode neighbourNode = comparer.Equals(thisEdge.a, thisVessel.connection.Comm) ? thisEdge.b : thisEdge.a;
                 Vessel destVessel = CNPUtils.findCorrespondingVessel(neighbourNode);
 
-                string neighbourAntType = neatAntennaType(neighbourNode); // stock bug
+                string neighbourHopType = neatHopType(neighbourNode); // stock bug
                 string neighbourLocation = (destVessel == null) ? FlightGlobals.GetHomeBodyName() : destVessel.mainBody.bodyName;
-                double linkDistance = thisEdge.cost;
+                double linkDistance = Vector3d.Distance(thisEdge.a.precisePosition, thisEdge.b.precisePosition); // stock bug
                 string neighbourName = neighbourNode.name;
-                double signalStrength = thisEdge.GetSignalStrength(neighbourNode); // stock bug: signalStrength mysteriously gives cost instead of [0,1]
+                double signalStrength = tempSignalFix(thisEdge);// stock bug
 
                 messages.Enqueue(string.Format("{0}{1}) {2} to {3} ({4}) @ {5} (signal {6}%)",
                                                 stringTab,
                                                 i+1,
                                                 CNPUtils.neatDistance(linkDistance),
                                                 CNPUtils.neatVesselName(neighbourName),
-                                                neighbourAntType,
+                                                neighbourHopType,
                                                 neighbourLocation,
                                                 CNPUtils.neatSignalStrength(signalStrength)));
             }
@@ -174,17 +175,23 @@ namespace commnetpeek
                 return "RELAY";
         }
 
-        private string neatAntennaType(CommNode commNodeRef)
+        private string neatHopType(CommNode commNodeRef)
         {
-            if (commNodeRef.antennaRelay.power == 0.0)
+            if (commNodeRef.isHome && commNodeRef.isControlSourceMultiHop)
+                return "GSTATION";
+            else if (!commNodeRef.isHome && commNodeRef.isControlSource)
+                return "PILOT";
+            else if (commNodeRef.antennaRelay.rangeCurve == null)
                 return "DIRECT";
             else
                 return "RELAY";
         }
 
-        private double tempFix(CommLink thisLink)
+        private double tempSignalFix(CommLink thisEdge)
         {
-            return Math.Max(thisLink.strengthAR, thisLink.strengthBR);
+            return Math.Max(thisEdge.strengthRR, Math.Max(thisEdge.strengthAR, thisEdge.strengthBR));
         }
+
     }
 }
+
